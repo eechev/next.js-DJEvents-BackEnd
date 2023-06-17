@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sub_events",
+  "info": {
+    "singularName": "sub-event",
+    "pluralName": "sub-events",
+    "displayName": "SubEvent"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event.event",
+      "mappedBy": "sub_event"
+    }
+  }
+}
