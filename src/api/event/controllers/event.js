@@ -39,8 +39,6 @@ module.exports = createCoreController("api::event.event", ({ strapi }) => ({
       populate: "*",
     };
 
-    //console.log(ctx.query);
-
     const { data, meta } = await super.find(ctx);
 
     return { data, meta };
@@ -65,12 +63,48 @@ module.exports = createCoreController("api::event.event", ({ strapi }) => ({
       console.log(updated);
       return updated;
     } catch (e) {
-      if (e.message.match("UNIQUE constraint failed") ) {
+      if (e.message.match("UNIQUE constraint failed")) {
         return ctx.badRequest("An event already exist with that name");
       } else {
         console.log(`Error from strapi: ${e.message}`);
         return ctx.internalServerError("Internal Server Error");
       }
     }
+  },
+
+  async update(ctx) {
+    const user = ctx.state.user;
+    const { id } = ctx.params;
+
+    const evt = await strapi.entityService.findMany("api::event.event", {
+      filters: {
+        id: id,
+        user: { id: user.id },
+      },
+    });
+
+    if (!evt[0]) {
+      return ctx.badRequest("You do not have access to this record");
+    }
+
+    return super.update(ctx);
+  },
+
+  async delete(ctx) {
+    const user = ctx.state.user;
+    const { id } = ctx.params;
+
+    const evt = await strapi.entityService.findMany("api::event.event", {
+      filters: {
+        id: id,
+        user: { id: user.id },
+      },
+    });
+
+    if (!evt[0]) {
+      return ctx.badRequest("You do not have access to this record");
+    }
+
+    return super.delete(ctx);
   },
 }));
