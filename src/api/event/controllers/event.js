@@ -39,7 +39,7 @@ module.exports = createCoreController("api::event.event", ({ strapi }) => ({
       populate: "*",
     };
 
-    console.log(ctx.query);
+    //console.log(ctx.query);
 
     const { data, meta } = await super.find(ctx);
 
@@ -48,10 +48,20 @@ module.exports = createCoreController("api::event.event", ({ strapi }) => ({
 
   ///overwrite create to link user to event
   async create(ctx) {
-    if (ctx.is("multipart")) {
-      const { data, files } = parseMultipartData(ctx);
-      console.log(data);
-      return null;
-    }
+    console.log("create called")
+    const user = ctx.state.user;
+    const evt = await super.create(ctx);
+    console.log(evt)
+    const updated = await strapi.entityService.update(
+      "api::event.event",
+      evt.data.id,
+      {
+        data: {
+          user: { id: user.id },
+        },
+      }
+    );
+    console.log(updated);
+    return updated;
   },
 }));

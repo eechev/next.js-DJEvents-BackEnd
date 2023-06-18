@@ -53,12 +53,6 @@
         "videos",
         "audios"
       ]
-    },
-    "sub_event": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sub-event.sub-event",
-      "inversedBy": "events"
     }
   }
 }
