@@ -48,20 +48,29 @@ module.exports = createCoreController("api::event.event", ({ strapi }) => ({
 
   ///overwrite create to link user to event
   async create(ctx) {
-    console.log("create called")
     const user = ctx.state.user;
-    const evt = await super.create(ctx);
-    console.log(evt)
-    const updated = await strapi.entityService.update(
-      "api::event.event",
-      evt.data.id,
-      {
-        data: {
-          user: { id: user.id },
-        },
+
+    try {
+      const evt = await super.create(ctx);
+      //console.log(evt)
+      const updated = await strapi.entityService.update(
+        "api::event.event",
+        evt.data.id,
+        {
+          data: {
+            user: { id: user.id },
+          },
+        }
+      );
+      console.log(updated);
+      return updated;
+    } catch (e) {
+      if (e.message.match("UNIQUE constraint failed") ) {
+        return ctx.badRequest("An event already exist with that name");
+      } else {
+        console.log(`Error from strapi: ${e.message}`);
+        return ctx.internalServerError("Internal Server Error");
       }
-    );
-    console.log(updated);
-    return updated;
+    }
   },
 }));
